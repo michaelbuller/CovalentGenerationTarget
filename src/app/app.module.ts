@@ -1,68 +1,92 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { NgModule, Type } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
 import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule, Title }  from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
+
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
+import { MatToolbarModule } from '@angular/material/toolbar';
+
+import { CovalentCommonModule } from '@covalent/core/common';
+import { CovalentLayoutModule } from '@covalent/core/layout';
+import { CovalentMediaModule } from '@covalent/core/media';
+import { CovalentLoadingModule } from '@covalent/core/loading';
+
+import { CovalentHttpModule, IHttpInterceptor } from '@covalent/http';
+
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+
+import { appRoutes } from './app.routes';
 
 import { AppComponent } from './app.component';
+import { RequestInterceptor } from '../config/interceptors/request.interceptor';
+import { MOCK_API } from '../config/api.config';
 
-import { MatButtonModule, MatListModule, MatCardModule, MatMenuModule, MatInputModule, MatButtonToggleModule, MatIconModule,
-         MatProgressSpinnerModule, MatSelectModule, MatSlideToggleModule, MatDialogModule, MatSnackBarModule, MatToolbarModule,
-         MatTabsModule, MatSidenavModule, MatTooltipModule, MatRippleModule, MatRadioModule, MatGridListModule,
-         MatDatepickerModule, MatNativeDateModule, MatSliderModule, MatAutocompleteModule } from '@angular/material';
+import { USER_PROVIDER, USERS_API } from './users';
+import { MainComponent } from './main.component';
+import { LoginComponent } from './login/login.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
-import { CovalentCommonModule, CovalentLayoutModule, CovalentMediaModule, CovalentExpansionPanelModule,
-         CovalentStepsModule, CovalentLoadingModule, CovalentDialogsModule, CovalentSearchModule, CovalentPagingModule,
-         CovalentNotificationsModule, CovalentMenuModule, CovalentDataTableModule, CovalentMessageModule } from '@covalent/core';
+const httpInterceptorProviders: Type<any>[] = [
+  RequestInterceptor,
+];
+
+export function getAPI(): string {
+  return MOCK_API;
+}
 
 @NgModule({
-  imports:      [
+  declarations: [
+    AppComponent,
+    MainComponent,
+    LoginComponent,
+    DashboardComponent,
+  ], // directives, components, and pipes owned by this NgModule
+  imports: [
+    // angular modules
+    CommonModule,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    RouterModule.forRoot([]),
     HttpClientModule,
-    /** Material Modules */
+    HttpModule,
+    // material modules
     MatButtonModule,
-    MatListModule,
-    MatIconModule,
     MatCardModule,
-    MatMenuModule,
+    MatIconModule,
+    MatListModule,
+    MatDividerModule,
     MatInputModule,
-    MatSelectModule,
-    MatButtonToggleModule,
-    MatSlideToggleModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
-    MatSnackBarModule,
     MatToolbarModule,
-    MatTabsModule,
-    MatSidenavModule,
-    MatTooltipModule,
-    MatRippleModule,
-    MatRadioModule,
-    MatGridListModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSliderModule,
-    MatAutocompleteModule,
-    /** Covalent Modules */
+    // covalent modules
     CovalentCommonModule,
     CovalentLayoutModule,
     CovalentMediaModule,
-    CovalentExpansionPanelModule,
-    CovalentStepsModule,
-    CovalentDialogsModule,
     CovalentLoadingModule,
-    CovalentSearchModule,
-    CovalentPagingModule,
-    CovalentNotificationsModule,
-    CovalentMenuModule,
-    CovalentDataTableModule,
-    CovalentMessageModule,
-    ],
-  declarations: [ AppComponent ],
-  bootstrap:    [ AppComponent ]
+    CovalentHttpModule.forRoot({
+      interceptors: [{
+        interceptor: RequestInterceptor, paths: ['**'],
+      }],
+    }),
+    // external modules
+    NgxChartsModule,
+    // routes
+    appRoutes,
+  ], // modules needed to run this module
+  providers: [
+    httpInterceptorProviders,
+    Title, {
+      provide: USERS_API, useFactory: getAPI,
+    }, USER_PROVIDER,
+  ], // additional providers needed for this module
+  entryComponents: [ ],
+  bootstrap: [ AppComponent ],
 })
-export class AppModule { }
+export class AppModule {}
